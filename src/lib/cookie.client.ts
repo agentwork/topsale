@@ -2,18 +2,54 @@
 // These functions manage cookies in the browser only.
 // Server actions handle cookie updates on the server side.
 
-export function setClientCookie(key: string, value: string, days = 7) {
+interface CookieStore {
+  get(name: string): Promise<string | undefined>;
+  set(params: { name: string; value: string; expires?: string; path?: string }): Promise<void>;
+  delete(name: string): Promise<void>;
+}
+
+declare global {
+  interface Window {
+    cookieStore?: CookieStore;
+  }
+}
+
+const cookieStore: CookieStore = {
+  async get(name) {
+    if (typeof window !== "undefined" && window.cookieStore) {
+      const cookie = await window.cookieStore.get(name);
+      return cookie?.value;
+    }
+    const match = document.cookie.split("; ").find((row) => row.startsWith(`${name}=`));
+    return match ? match.split("=")[1] : undefined;
+  },
+  async set(params) {
+    if (typeof window !== "undefined" && window.cookieStore) {
+      await window.cookieStore.set(params);
+    } else {
+      // biome-ignore lint/suspicious/noDocumentCookie: fallback for browsers without cookieStore API
+      document.cookie = `${params.name}=${params.value}; expires=${params.expires || ""}; path=${params.path || "/"}`;
+    }
+  },
+  async delete(name) {
+    if (typeof window !== "undefined" && window.cookieStore) {
+      await window.cookieStore.delete(name);
+    } else {
+      // biome-ignore lint/suspicious/noDocumentCookie: fallback for browsers without cookieStore API
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+    }
+  },
+};
+
+export async function setClientCookie(key: string, value: string, days = 7) {
   const expires = new Date(Date.now() + days * 864e5).toUTCString();
-  document.cookie = `${key}=${value}; expires=${expires}; path=/`;
+  await cookieStore.set({ name: key, value, expires, path: "/" });
 }
 
-export function getClientCookie(key: string) {
-  return document.cookie
-    .split("; ")
-    .find((row) => row.startsWith(`${key}=`))
-    ?.split("=")[1];
+export async function getClientCookie(key: string) {
+  return cookieStore.get(key);
 }
 
-export function deleteClientCookie(key: string) {
-  document.cookie = `${key}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+export async function deleteClientCookie(key: string) {
+  await cookieStore.delete(key);
 }
