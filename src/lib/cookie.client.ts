@@ -8,12 +8,6 @@ interface CookieStore {
   delete(name: string): Promise<void>;
 }
 
-declare global {
-  interface Window {
-    cookieStore?: CookieStore;
-  }
-}
-
 const cookieStore: CookieStore = {
   async get(name) {
     if (typeof window !== "undefined" && window.cookieStore) {
@@ -25,7 +19,9 @@ const cookieStore: CookieStore = {
   },
   async set(params) {
     if (typeof window !== "undefined" && window.cookieStore) {
-      await window.cookieStore.set(params);
+      await window.cookieStore.set(
+        params as unknown as globalThis.CookieStore["set"] extends (params: infer P) => unknown ? P : never,
+      );
     } else {
       // biome-ignore lint/suspicious/noDocumentCookie: fallback for browsers without cookieStore API
       document.cookie = `${params.name}=${params.value}; expires=${params.expires || ""}; path=${params.path || "/"}`;

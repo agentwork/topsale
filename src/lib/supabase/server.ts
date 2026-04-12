@@ -12,7 +12,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export async function createClient() {
   const cookieStore = await cookies();
 
-  return createServerClient(supabaseUrl, supabaseAnonKey, {
+  return createServerClient(supabaseUrl as string, supabaseAnonKey as string, {
     cookies: {
       getAll() {
         return cookieStore.getAll();
