@@ -8,6 +8,7 @@ import {
   GraduationCap,
   Kanban,
   LayoutDashboard,
+  ListTodo,
   Lock,
   type LucideIcon,
   Mail,
@@ -109,6 +110,12 @@ export const sidebarItems: NavGroup[] = [
         url: "/dashboard/coming-soon",
         icon: Calendar,
         comingSoon: true,
+      },
+      {
+        title: "Todo",
+        url: "/dashboard/todo",
+        icon: ListTodo,
+        isNew: true,
       },
       {
         title: "Kanban",
