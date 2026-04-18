@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1776182549272,
+      "tag": "0000_wandering_calypso",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1776182567946,
+      "tag": "0001_nosy_nextwave",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1776233291542,
+      "tag": "0002_dark_richard_fisk",
+      "breakpoints": true
+    }
+  ]
+}
