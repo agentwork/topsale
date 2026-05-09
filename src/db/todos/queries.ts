@@ -2,6 +2,7 @@ import { desc, eq, like, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import { type NewTodo, type Todo, todos } from "@/db/schema";
+import type { PaginatedResult } from "@/db/types";
 
 export type TodoPriority = "low" | "medium" | "high";
 
@@ -13,14 +14,6 @@ export interface TodosQueryParams {
   priority?: TodoPriority;
   sortBy?: "title" | "createdAt" | "priority" | "dueDate";
   sortOrder?: "asc" | "desc";
-}
-
-export interface PaginatedResult<T> {
-  data: T[];
-  total: number;
-  page: number;
-  pageSize: number;
-  pageCount: number;
 }
 
 export async function getTodos(params: TodosQueryParams = {}): Promise<PaginatedResult<Todo>> {

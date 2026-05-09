@@ -1,68 +1,15 @@
 import { z } from "zod";
 
+import { accountCreateSchema, accountQuerySchema, accountUpdateSchema } from "@/app/(main)/dashboard/crm/schema";
 import * as queries from "@/db/crm/queries/accounts";
 import type { NewAccount } from "@/db/crm/schema";
 
 import { publicProcedure, router } from "../../trpc";
 
-const accountCreateSchema = z
-  .object({
-    accountName: z.string().min(1),
-    shortName: z.string().min(1),
-    taxId: z.string().optional(),
-    personalId: z.string().optional(),
-    address: z.string().min(1),
-    groupId: z.string().uuid().optional(),
-    accountType: z.enum(["agency", "client"]),
-    agencyTier: z.enum(["tier1", "tier2", "tier3"]),
-    paymentTerm: z.enum(["net30", "net60", "net90", "within30", "within45", "prepaid"]),
-    accountOwner: z.string().optional(),
-    primaryContactId: z.string().uuid().optional(),
-    customerPreference: z.string().optional(),
-    internalPolitics: z.string().optional(),
-    alliance: z.enum(["apex", "omnet"]).optional(),
-    isBlacklist: z.boolean().optional(),
-  })
-  .refine((data) => data.taxId || data.personalId, { message: "統一編號或身分字號至少需要填寫一個", path: ["taxId"] });
-
-const accountUpdateSchema = z.object({
-  id: z.string().uuid(),
-  data: z.object({
-    accountName: z.string().min(1).optional(),
-    shortName: z.string().min(1).optional(),
-    taxId: z.string().optional(),
-    personalId: z.string().optional(),
-    address: z.string().min(1).optional(),
-    groupId: z.string().uuid().optional().nullable(),
-    accountType: z.enum(["agency", "client"]).optional(),
-    agencyTier: z.enum(["tier1", "tier2", "tier3"]).optional().nullable(),
-    paymentTerm: z.enum(["net30", "net60", "net90", "within30", "within45", "prepaid"]).optional(),
-    accountOwner: z.string().optional().nullable(),
-    primaryContactId: z.string().uuid().optional().nullable(),
-    customerPreference: z.string().optional(),
-    internalPolitics: z.string().optional(),
-    alliance: z.enum(["apex", "omnet"]).optional().nullable(),
-    isBlacklist: z.boolean().optional(),
-    status: z.enum(["active", "inactive"]).optional(),
-  }),
-});
-
 export const accountsRouter = router({
-  list: publicProcedure
-    .input(
-      z.object({
-        page: z.number().int().positive().default(1),
-        pageSize: z.number().int().positive().max(100).default(20),
-        search: z.string().optional(),
-        accountType: z.enum(["agency", "client"]).optional(),
-        agencyTier: z.enum(["tier1", "tier2", "tier3"]).optional(),
-        groupId: z.string().uuid().optional(),
-        status: z.enum(["active", "inactive"]).optional(),
-      }),
-    )
-    .query(async ({ input }) => {
-      return queries.getAccounts(input);
-    }),
+  list: publicProcedure.input(accountQuerySchema).query(async ({ input }) => {
+    return queries.getAccounts(input);
+  }),
 
   getById: publicProcedure.input(z.object({ id: z.string().uuid() })).query(async ({ input }) => {
     const account = await queries.getAccountById(input.id);

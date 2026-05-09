@@ -64,7 +64,7 @@ export default function AccountDetailPage() {
 
   const [showHistory, setShowHistory] = useState(false);
 
-  const { data: account, isLoading, error, refetch } = trpc.crm.accounts.getById.useQuery({ id });
+  const { data: account, isLoading, error } = trpc.crm.accounts.getById.useQuery({ id });
   const { data: brands } = trpc.crm.accounts.getBrandsByAccount.useQuery({ accountId: id }, { enabled: !!id });
   const { data: contacts } = trpc.crm.accounts.getContactsByAccount.useQuery({ accountId: id }, { enabled: !!id });
   const { data: group } = trpc.crm.groups.getById.useQuery(
